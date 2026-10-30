@@ -4,8 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kana Quiz</title>
-<link rel="icon" type="image/jpeg" href="./logo.jpeg">
-<link rel="apple-touch-icon" sizes="192x192" href="./logo.jpeg">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#121212;--ink:#e8e8e8;--dim:#a0a0a0;--blue:#1f6fa8;--blue2:#2a82c3;--edge:#4a4a4a;--field:#3a3a3a;--ok:#5fd39a;--bad:#ff8a8a;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -36,7 +34,10 @@ select{background:var(--field);color:var(--ink);border:2px solid var(--edge);pad
 .hint{color:var(--dim);font-size:.92rem;text-align:center}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:12px;margin-top:22px}
 .card{background:var(--blue);border:3px solid #3b88c0;border-radius:10px;padding:8px 8px 10px;text-align:center;transition:border-color .15s,background .15s}
-.card .k{font-size:2.4rem;line-height:1.3;font-weight:500}
+.card .k{font-size:2.4rem;line-height:1.3;font-weight:500;white-space:nowrap}
+.card .k.two{font-size:2rem}
+.cell .k{white-space:nowrap}
+.kx .smk{font-size:1.5rem;box-shadow:inset 0 -3px 0 var(--blue2)}
 .card input{width:100%;background:var(--field);color:var(--ink);border:2px solid transparent;border-radius:8px;padding:6px;text-align:center;font:inherit;font-size:1rem}
 .card.ok{border-color:#0d0d0d}
 .card.ok input{background:#262626}
@@ -57,7 +58,7 @@ select{background:var(--field);color:var(--ink);border:2px solid var(--edge);pad
 .card.shake{animation:shake .4s}
 .card input::placeholder{color:#c4c4c4;opacity:1}
 .kb{position:fixed;left:0;right:0;bottom:0;background:#181818;border-top:2px solid var(--edge);border-radius:16px 16px 0 0;box-shadow:0 -6px 20px #000a;padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));margin:0;z-index:20}
-#quiz.kbon{padding-bottom:310px}
+#quiz.kbon{padding-bottom:340px}
 .kg{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;max-width:640px;margin:0 auto}
 .kx{display:flex;gap:4px;max-width:640px;margin:4px auto 0;flex-wrap:wrap}
 .kg button,.kx button{background:var(--field);border:1px solid var(--edge);border-radius:6px;min-height:38px;font-size:1.1rem;padding:0}
@@ -96,7 +97,7 @@ select{background:var(--field);color:var(--ink);border:2px solid var(--edge);pad
 <section id="quiz" class="hide">
   <h1 id="qtitle">Type the romaji</h1>
   <p class="hint" id="qhint"></p>
-  <div class="bar"><span id="prog"></span><button class="tgl" id="kbtn" aria-pressed="false">Hiragana keyboard: off</button><span id="score"></span></div>
+  <div class="bar"><span id="prog"></span><button class="tgl" id="kbtn" aria-pressed="false">Kana keyboard: off</button><span id="score"></span></div>
   <div class="grid" id="grid"></div>
   <div class="btns"><button class="go" id="finish">Finish quiz</button></div>
   <div class="kb hide" id="kb"><div class="kg" id="kg"></div><div class="kx" id="kx"></div></div>
@@ -148,6 +149,9 @@ function toHira(s){let o="",i=0;while(i<s.length){
   if(s[i]===s[i+1]&&!"aiueon".includes(s[i])){o+="っ";i++;continue}
   let m=0;for(let l=3;l>0;l--){const h=R2H[s.substr(i,l)];if(h){o+=h;i+=l;m=1;break}}
   if(!m){o+=s[i];i++}}return o}
+const bigY=(g,k)=>g==="com"?[k.replace(/[ゃゅょャュョ]/g,c=>"やゆよヤユヨ"["ゃゅょャュョ".indexOf(c)])]:[];
+const hk=c=>c.replace(/[\u30a1-\u30f6]/g,x=>String.fromCharCode(x.charCodeAt(0)-96));
+let kbKata=false;
 function parseK(s){return s.split(";").map(e=>{const [k,r,m]=e.split("|");return {k,r:r.split(","),m:m.split(",")}})}
 const KJ={n5:parseK("一|ichi,hito|one;二|ni,futa|two;三|san,mi|three;四|shi,yon,yo|four;五|go,itsu|five;六|roku,mu|six;七|shichi,nana|seven;八|hachi,ya|eight;九|kyuu,ku,kokono|nine;十|juu,too|ten;百|hyaku|hundred;千|sen,chi|thousand;万|man|ten thousand;円|en|yen,circle;日|nichi,hi,ka|day,sun;月|getsu,gatsu,tsuki|month,moon;火|ka,hi|fire;水|sui,mizu|water;木|moku,ki|tree,wood;金|kin,kane|gold,money;土|do,tsuchi|earth,soil;年|nen,toshi|year;時|ji,toki|time,hour;分|fun,bun,wakaru|minute,part;半|han,nakaba|half;今|kon,ima|now;間|kan,aida,ma|interval,between;前|zen,mae|before,front;後|go,ato,ushiro|after,behind;午|go|noon;毎|mai|every;週|shuu|week;何|nan,nani|what;人|jin,nin,hito|person;男|dan,otoko|man,male;女|jo,onna|woman,female;子|shi,ko|child;父|fu,chichi|father;母|bo,haha|mother;友|yuu,tomo|friend;先|sen,saki|previous,ahead;生|sei,nama,i,u|life,birth;学|gaku,mana|study,learn;校|kou|school;大|dai,tai,oo|big,large;小|shou,chiisa,ko|small,little;中|chuu,naka|middle,inside;上|jou,ue,kami|up,above;下|ka,ge,shita|down,below;左|sa,hidari|left;右|yuu,u,migi|right;外|gai,soto|outside;国|koku,kuni|country;山|san,yama|mountain;川|sen,kawa|river;田|den,ta|rice field;天|ten|heaven,sky;雨|u,ame|rain;気|ki|spirit,air;電|den|electricity;車|sha,kuruma|car;駅|eki|station;道|dou,michi|road,way;東|tou,higashi|east;西|sai,nishi|west;南|nan,minami|south;北|hoku,kita|north;白|haku,shiro|white;赤|seki,aka|red;青|sei,ao|blue;入|nyuu,hairu,ireru|enter;出|shutsu,deru,dasu|exit,leave;立|ritsu,tatsu|stand;休|kyuu,yasumu|rest;来|rai,kuru|come;行|kou,gyou,iku|go;見|ken,miru|see,look;聞|bun,kiku|hear,listen;言|gen,gon,iu|say;話|wa,hanasu|talk,speak;読|doku,yomu|read;書|sho,kaku|write;食|shoku,taberu|eat;飲|in,nomu|drink;買|bai,kau|buy;会|kai,au|meet;語|go|language;本|hon|book,origin;文|bun,mon|sentence,writing;名|mei,na|name;長|chou,nagai|long;高|kou,takai|tall,high;安|an,yasui|cheap,safe;新|shin,atarashii|new;古|ko,furui|old;多|ta,ooi|many;少|shou,sukunai|few,little;正|sei,tadashi|correct;目|moku,me|eye;耳|ji,mimi|ear;口|kou,kuchi|mouth;手|shu,te|hand;足|soku,ashi|foot,leg;力|ryoku,chikara|power,strength;花|ka,hana|flower;魚|gyo,sakana|fish;犬|ken,inu|dog;店|ten,mise|shop,store;物|butsu,mono|thing;空|kuu,sora|sky,empty"),
 n4:parseK("悪|aku,warui|bad;暗|an,kurai|dark;医|i|medicine,doctor;意|i|meaning,mind;引|in,hiku|pull;院|in|institution;運|un,hakobu|carry,luck;英|ei|english;映|ei,utsuru|reflect,project;遠|en,tooi|far;屋|oku,ya|roof,shop;音|on,oto|sound;夏|ka,natsu|summer;家|ka,ie,uchi|house,home;歌|ka,uta|song,sing;画|ga,kaku|picture,stroke;回|kai,mawaru|times,turn;開|kai,hiraku,akeru|open;楽|gaku,raku,tanoshii|music,fun;館|kan|building,hall;寒|kan,samui|cold;帰|ki,kaeru|return,go home;起|ki,okiru|wake up,rise;急|kyuu,isogu|hurry,urgent;牛|gyuu,ushi|cow;去|kyo,saru|leave,past;強|kyou,tsuyoi|strong;教|kyou,oshieru|teach;業|gyou|business,work;近|kin,chikai|near,close;銀|gin|silver;苦|ku,kurushii|suffering,bitter;区|ku|ward,district;計|kei,hakaru|plan,measure;兄|kei,ani|older brother;軽|kei,karui|light;県|ken|prefecture;建|ken,tateru|build;元|gen,moto|origin,source;原|gen,hara|field,original;公|kou,ooyake|public;工|kou|craft,construction;広|kou,hiroi|wide;交|kou,majiru|mix,exchange;光|kou,hikari|light;考|kou,kangaeru|think,consider;合|gou,au|fit,match;黒|koku,kuroi|black;作|saku,tsukuru|make;思|shi,omou|think;止|shi,tomaru|stop;死|shi,shinu|die,death;私|shi,watashi|private,I;紙|shi,kami|paper;試|shi,tameshi|test,try;字|ji|character,letter;自|ji,shi|self;室|shitsu|room;質|shitsu|quality,substance;写|sha,utsusu|copy,photograph;社|sha|company,shrine;者|sha,mono|person;借|shaku,kariru|borrow;主|shu,nushi|master,main;秋|shuu,aki|autumn;集|shuu,atsumeru|gather;習|shuu,narau|learn;春|shun,haru|spring;所|sho,tokoro|place;暑|sho,atsui|hot weather;重|juu,omoi|heavy;場|jou,ba|place,location;色|shoku,iro|color;真|shin,ma|true,reality;親|shin,oya|parent;心|shin,kokoro|heart,mind;深|shin,fukai|deep;世|sei,yo|world,generation;声|sei,koe|voice;切|setsu,kiru|cut;説|setsu|explain,theory;線|sen|line;洗|sen,arau|wash;早|sou,hayai|early;走|sou,hashiru|run;送|sou,okuru|send;続|zoku,tsuduku|continue;太|tai,futoi|thick,fat;体|tai,karada|body;待|tai,matsu|wait;貸|tai,kasu|lend;題|dai|topic,subject;代|dai,kawari|substitute,era;宅|taku|home,house;茶|cha|tea;着|chaku,kiru,tsuku|wear,arrive;昼|chuu,hiru|noon,daytime;注|chuu,sosogu|pour,note;町|chou,machi|town;通|tsuu,toosu,kayou|pass,commute;転|ten,korobu|roll,turn;点|ten|point,dot;度|do,tabi|degree,times;答|tou,kotae|answer;頭|tou,atama|head;動|dou,ugoku|move;同|dou,onaji|same;働|dou,hataraku|work;特|toku|special;肉|niku|meat;売|bai,uru|sell;発|hatsu|departure,emit;病|byou,yamai|illness;品|hin,shina|goods,article;不|fu|not,un-;風|fuu,kaze|wind,style;服|fuku|clothes;別|betsu|separate,other;勉|ben|effort,study;便|ben,bin,tayori|convenient,mail;歩|ho,aruku|walk;方|hou,kata|direction,way;妹|mai,imouto|younger sister;味|mi,aji|taste;民|min|people;明|mei,akarui|bright;門|mon|gate;問|mon,toi|question;夜|ya,yoru|night;野|ya,no|field,plain;用|you,mochiiru|use,business;洋|you|ocean,western;理|ri|reason,logic;料|ryou|fee,material;旅|ryo,tabi|trip,travel;冬|tou,fuyu|winter;姉|shi,ane|older sister;弟|dai,otouto|younger brother;朝|chou,asa|morning;夕|seki,yuu|evening;地|chi,ji|ground,earth;鉄|tetsu|iron;図|zu,to|map,drawing;持|ji,motsu|hold,have;使|shi,tsukau|use;知|chi,shiru|know;住|juu,sumu|live,reside;始|shi,hajimeru|begin,start;終|shuu,owaru|end,finish;仕|shi|serve,do;事|ji,koto|thing,matter;海|kai,umi|sea,ocean;鳥|chou,tori|bird;馬|ba,uma|horse;米|bei,kome|rice;閉|hei,shimeru|close")};
@@ -187,10 +191,10 @@ function buildPool(hiraOnly){
   const pool=[];
   Object.entries(G).forEach(([g,d])=>d.rows.forEach(r=>{
     if(!sel.has(g+":"+r[0]))return;
-    if(g==="kan"){KJ[r[0]].forEach((e,n)=>{const h=e.r.map(toHira),q=Math.floor(n/4);pool.push({k:e.k,hira:h.join("、"),rom:e.r.join(","),mean:e.m.join(", "),ans:hiraOnly?h:[...e.r,...h,...e.m],row:"kan:"+r[0]+":"+q,g,rowName:r[0].toUpperCase()+" set "+(q+1),sc:"kanji"})});return}
+    if(g==="kan"){KJ[r[0]].forEach((e,n)=>{const h=e.r.map(toHira),q=Math.floor(n/4);pool.push({k:e.k,hira:h.join("、"),rom:e.r.join(","),mean:e.m.join(", "),ans:hiraOnly?h:[...e.r,...h,...h.map(kata),...e.m],row:"kan:"+r[0]+":"+q,g,rowName:r[0].toUpperCase()+" set "+(q+1),sc:"kanji"})});return}
     const ks=split(g,r[1]),rs=r[2].split(" ");
     (mode==="learn"||hiraOnly?["kata"]:script==="both"?["hira","kata"]:[script]).forEach(sc=>ks.forEach((k,i)=>
-      pool.push({k:sc==="kata"?kata(k):k,hira:k,rom:rs[i].split("/")[0],ans:hiraOnly?[k]:sc==="kata"?[...rs[i].split("/"),k]:rs[i].split("/"),row:g+":"+r[0]+":"+sc,g,rowName:r[0],sc})))}));
+      pool.push({k:sc==="kata"?kata(k):k,hira:k,rom:rs[i].split("/")[0],ans:hiraOnly?[k,...bigY(g,k)]:sc==="kata"?[...rs[i].split("/"),k,...bigY(g,k)]:rs[i].split("/").concat([kata(k),...bigY(g,kata(k))]),row:g+":"+r[0]+":"+sc,g,rowName:r[0],sc})))}));
   return pool;
 }
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -203,13 +207,13 @@ function begin(pool,prac){practice=!!prac;
   const grid=$("grid");grid.innerHTML="";
   items.forEach((it,i)=>{
     const d=document.createElement("div");d.className="card";
-    d.innerHTML=`<div class="k">${it.k}</div><input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Romaji for ${it.k}">`;
+    d.innerHTML=`<div class="k${it.k.length>1?" two":""}">${it.k}</div><input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Romaji for ${it.k}">`;
     const inp=d.querySelector("input");
     inp.addEventListener("keydown",e=>{
       if(e.key!=="Enter"||e.isComposing)return;e.preventDefault();
       check(i);});
     grid.appendChild(d)});
-  update();setKb();$("qtitle").textContent=practice?"Type the hiragana":"Type the romaji";$("qhint").textContent=practice?"Type the hiragana for each katakana. Press Enter to check it.":"Type the romaji (for katakana, hiragana works too). For kanji, type a reading or the meaning. Press Enter to check it.";show("quiz");
+  update();setKb();$("qtitle").textContent=practice?"Type the hiragana":"Type the romaji";$("qhint").textContent=practice?"Type the hiragana for each katakana. Press Enter to check it.":"Type the romaji, or the same kana in the other script (hiragana or katakana). For kanji, type a reading or the meaning. Press Enter to check it.";show("quiz");
   const f=grid.querySelector("input");if(f)f.focus();
 }
 function update(){
@@ -296,7 +300,7 @@ function renderLearn(pool){
 
 function check(i){
   const it=items[i],card=$("grid").children[i],inp=card.querySelector("input");
-  const v=inp.value.trim().toLowerCase();
+  const v=inp.value.normalize("NFKC").trim().toLowerCase();
   if(it.res||!v){if(items.every(x=>x.first!==null))$("finish").focus();return}
   const ok=it.ans.includes(v);
   if(it.first===null){it.first=ok;it.val=v}if(!ok)it.wrong++;
@@ -312,15 +316,16 @@ const KC=["あいうえお","かきくけこ","さしすせそ","たちつてと
 const VO="かきくけこさしすせそたちつてとはひふへほ",VD="がぎぐげござじずぜぞだぢづでどばびぶべぼ";
 const HA="はひふへほ",PA="ぱぴぷぺぽ",BA="ばびぶべぼ";
 function mark(c,kind){
+  if(kind==="sm"){const A="あいうえおつやゆよわ",B="ぁぃぅぇぉっゃゅょゎ";let i=A.indexOf(c);if(i>=0)return B[i];i=B.indexOf(c);return i>=0?A[i]:null}
   if(kind==="dk"){let i=VO.indexOf(c);if(i>=0)return VD[i];i=VD.indexOf(c);return i>=0?VO[i]:null}
   let i=HA.indexOf(c);if(i>=0)return PA[i];i=PA.indexOf(c);if(i>=0)return HA[i];i=BA.indexOf(c);return i>=0?PA[i]:null;
 }
 for(let r=0;r<5;r++)KC.forEach(col=>{
   const ch=col[r],b=document.createElement("button");b.type="button";
-  if(ch==="_"){b.className="gap";b.disabled=true;b.tabIndex=-1}else{b.textContent=ch;b.dataset.a=ch}
+  if(ch==="_"){b.className="gap";b.disabled=true;b.tabIndex=-1}else{b.textContent=ch;b.dataset.a=ch;b.dataset.h=ch}
   $("kg").appendChild(b)});
-[["ん","ん"],["ゃ","ゃ"],["ゅ","ゅ"],["ょ","ょ"],["っ","っ"],["ー","ー"],["゛","dk"],["゜","hd"],["⌫","bs"],["Enter","en"]].forEach(([t,a])=>{
-  const b=document.createElement("button");b.type="button";b.textContent=t;b.dataset.a=a;if(a==="en")b.className="enter";
+[["ん","ん"],["ゃ","ゃ"],["ゅ","ゅ"],["ょ","ょ"],["っ","っ"],["ー","ー"],["゛","dk"],["゜","hd"],["小","sm"],["カナ","sw"],["⌫","bs"],["Enter","en"]].forEach(([t,a])=>{
+  const b=document.createElement("button");b.type="button";b.textContent=t;b.dataset.a=a;if(a.length===1)b.dataset.h=a;if("ゃゅょっ".includes(a))b.className="smk";if(a==="en")b.className="enter";
   if(a==="bs"||a==="dk"||a==="hd")b.setAttribute("aria-label",{bs:"Backspace",dk:"Add dakuten",hd:"Add handakuten"}[a]);
   $("kx").appendChild(b)});
 $("kb").addEventListener("mousedown",e=>e.preventDefault());
@@ -330,17 +335,18 @@ $("kb").addEventListener("click",e=>{
   const inp=cur&&all.includes(cur)?cur:all[0];if(!inp)return;
   inp.focus();
   const a=b.dataset.a,s=inp.selectionStart,t=inp.selectionEnd;
-  if(inp.readOnly&&a!=="en")return;
+  if(a==="sw"){kbKata=!kbKata;swapKb(b);return}if(inp.readOnly&&a!=="en")return;
   if(a==="en")check(all.indexOf(inp));
   else if(a==="bs"){if(s!==t)inp.setRangeText("",s,t,"end");else if(s>0)inp.setRangeText("",s-1,s,"end")}
-  else if(a==="dk"||a==="hd"){if(s>0&&s===t){const n=mark(inp.value[s-1],a);if(n)inp.setRangeText(n,s-1,s,"end")}}
+  else if(a==="dk"||a==="hd"||a==="sm"){if(s>0&&s===t){const pc=inp.value[s-1],n=mark(hk(pc),a);if(n)inp.setRangeText(/[\u30a1-\u30f6]/.test(pc)?kata(n):n,s-1,s,"end")}}
   else inp.setRangeText(a,s,t,"end");
 });
+function swapKb(b){document.querySelectorAll("#kg button[data-h],#kx button[data-h]").forEach(x=>{const c=kbKata?kata(x.dataset.h):x.dataset.h;x.textContent=c;x.dataset.a=c});b.textContent=kbKata?"ひら":"カナ"}
 function setKb(){
   $("kb").classList.toggle("hide",!kbOn);
   $("kbtn").classList.toggle("on",kbOn);
   $("kbtn").setAttribute("aria-pressed",kbOn);
-  $("kbtn").textContent="Hiragana keyboard: "+(kbOn?"on":"off");
+  $("kbtn").textContent="Kana keyboard: "+(kbOn?"on":"off");
   $("grid").querySelectorAll("input").forEach(i=>i.inputMode=kbOn?"none":"text");
   $("quiz").classList.toggle("kbon",kbOn);
 }
